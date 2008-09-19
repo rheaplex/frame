@@ -1,0 +1,14 @@
+COPYING.txt
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+bin/frame
+lib/frame.rb
+lib/move.rb
+lib/release.rb
+lib/web.rb
+lib/work.rb
+templates/template.psd
+templates/template.svg
+test/test_frame.rb
