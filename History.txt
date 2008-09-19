@@ -1,0 +1,6 @@
+=== 0.0.1 / 2008-09-08
+
+* 1 major enhancement
+
+  * Initial Revision.
+
