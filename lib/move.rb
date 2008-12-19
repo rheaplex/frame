@@ -102,20 +102,30 @@ class Move
   end
   
   def file_of_status file, status
-    "#{status}/#{File.basename(file)}"
+    "#{@project_dir}/#{status}/#{File.basename(file)}"
   end
     
   def file_path_in_project name
     # Default to preparatory if no directory provided
+    # FIXME add absolute and relative paths
     if name.index('/') == nil
-      "preparatory/" + name
+      "#{@project_dir}/preparatory/" + name
     else
       name
     end
   end
   
   def process_arguments
-    @work = file_path_in_project @arguments[0]
+    if File.dirname(@arguments[0]) == "."
+      # filename only
+      @work = "#{@project_dir}/preparatory/#{@arguments[0]}"
+    elsif @arguments[0].index(@project_dir) != nil # Robustify me
+      # absolute path
+      @work = @arguments[0]
+    else
+      # status/filename
+      @work = "#{@project_dir}/#{@arguments[0]}"
+    end
     @destination = file_of_status @work, @status
   end
   

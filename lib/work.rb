@@ -77,7 +77,16 @@ class Work
     opts.on('-v', '--version')        { output_version ; exit 0 }
     opts.on('-h', '--help')           { output_help }
     opts.on('-c FILE', '--copy FILE') do |source|
-      @source_work_name = "#{@work_dir}/#{source}" 
+      if File.dirname(source) == "."
+        # filename only
+        @source_work_name = "#{@work_dir}/#{source}"
+      elsif source.index(@project_dir) != nil # Robustify me
+        # absolute path
+        @source_work_name = source
+      else
+        # status/filename
+        @source_work_name = "#{@project_dir}/#{source}"
+      end
     end
     # This consumes matched arguments from @arguments
     opts.parse!(@arguments) rescue return false
