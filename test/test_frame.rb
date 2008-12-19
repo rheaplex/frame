@@ -26,7 +26,7 @@ end
 
 # Test making a project
 
-Kernel.system '../bin/frame', 'test_project' 
+Kernel.system 'bin/frame', 'test_project'
 raise "Couldn't make test project." unless File.exist? './test_project'
 
 
@@ -34,32 +34,32 @@ raise "Couldn't make test project." unless File.exist? './test_project'
 
 Kernel.system 'test_project/script/work', 'work.svg' 
 raise "Couldn't make test svg work." unless 
-  File.exist? './test_project/preparatory/work.svg'
+  File.exist? 'test_project/preparatory/work.svg'
 
 Kernel.system 'test_project/script/work', '-c', 'work.svg', 'work2.svg'
 raise "Couldn't make relative test svg work copy." unless 
-  File.exist? './test_project/preparatory/work2.svg'
+  File.exist? 'test_project/preparatory/work2.svg'
 
 Kernel.system 'test_project/script/work', '-c', 
-              './test_project/preparatory/work2.svg', 'work3.svg'
+              'preparatory/work2.svg', 'work3.svg'
 raise "Couldn't make absolute test svg work copy." unless 
-  File.exist? './test_project/preparatory/work3.svg'
+  File.exist? 'test_project/preparatory/work3.svg'
 
 
 # Test Move
 
 Kernel.system 'test_project/script/move', '--discard', 'work2.svg'
 raise "Couldn't move work to discard." unless 
-  File.exist? './test_project/final/work2.svg'
+  File.exist? 'test_project/discard/work2.svg'
 
 Kernel.system 'test_project/script/move', '--final', 'work3.svg'
 raise "Couldn't move work to final." unless 
-  File.exist? './test_project/final/work3.svg'
+  File.exist? 'test_project/final/work3.svg'
 
 Kernel.system 'test_project/script/move', '--discard', 'work.svg'
-Kernel.system 'test_project/script/move', '--preparatory', 'work.svg'
+Kernel.system 'test_project/script/move', '--preparatory', 'discard/work.svg'
 raise "Couldn't move work back to preparatory." unless 
-  File.exist? './test_project/final/work.svg'
+  File.exist? 'test_project/preparatory/work.svg'
 
 
 # Test Release
