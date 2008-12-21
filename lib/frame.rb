@@ -1,51 +1,5 @@
 #!/usr/env ruby
 
-#    frame - create and manage digital art project directory structures
-#    Copyright (C) 2008 Rob Myers
-# 
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-# 
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#    GNU General Public License for more details.
-# 
-#    You should have received a copy of the GNU General Public License
-#    along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-# == Synopsis
-#    Creates a directory structure for an SVG-based art project
-#    and populates it with useful resources and scripts.
-#
-# == Examples
-#    Create a project called flowers:
-#    frame flowers
-#
-# == Usage
-#    frame [options] project_name
-#
-#    For help use: art_project -h
-#
-# == Options
-#   -h, --help          Displays help message
-#   -v, --version       Display version number
-#   -a, --artist        Your name
-#   -l, --license       Set the Creative Commons license URL for the project
-#   -g, --git URL       Use the git version control system for the project
-#   -s, --svn URL       Use the svn version control system for the project
-#   -d, --date          The year(s) for the copyright message
-#
-# == Author
-#    Rob Myers <rob@robmyers.org>
-#
-# == Copyright
-#    Copyright (C) 2008 Rob Myers. Licensed under the GNU GPL 3 or later.
-#    http://www.gnu.org/licenses/gpl-3.0.html
-
-
 require 'fileutils'
 #require 'liblicense'
 require 'optparse' 
@@ -58,10 +12,9 @@ class Frame
   
   def initialize (arguments)    
     @arguments = arguments
-
-    # Here __FILE__ is the absolute path to the installed script
-    @generator_dir = File.dirname(__FILE__) 
-    @source_dir = File.dirname(@generator_dir)
+    # Here __FILE__ is the absolute path to this installed script
+    @lib_dir = File.dirname(__FILE__)
+    @source_dir = File.dirname(@lib_dir)
     @template_dir = @source_dir + '/templates'
     
     initialize_project_details
@@ -85,7 +38,7 @@ class Frame
     @project.artist = ''
     @project.remote_repository = nil
     @project.use_git = false
-    @project.use_svn = false
+    @project.use_svn = :no
     @project.license_uri = ''
     
     # Don't save to the yaml in case the directory is moved by the user
@@ -101,10 +54,11 @@ class Frame
       @project.use_git = true
       @project.remote_repository = uri
     end
-    opts.on("-s", "--svn URI")  do |uri| 
-      @project.use_svn = true
+    opts.on("-r", "--svn-rep URI")  do |uri|
+      @project.use_svn = :repository
       @project.remote_repository = uri
     end 
+    opts.on("-d", "--svn-dir")  { @project.use_svn = :subdirectory }
     #opts.on('-l LICENSE', '--license URI')  do |license|
     #  @project.license_id << license
     #end 
@@ -131,8 +85,8 @@ class Frame
       puts "No project name specified."
       return false
     end
-    if @project.use_git && @project.use_svn
-      puts "Both git and svn specified. Please one or the other, not both."
+    if @project.use_git && (@project.use_svn != :no)
+      puts "Both git and svn specified. Please specify one or the other, not both."
       return false
     end
     if @project.use_git
@@ -141,7 +95,7 @@ class Frame
         return false
       end
     end
-    if @project.use_svn
+    if @project.use_svn == :repository
       if @project.remote_repository.rindex(@project.unix_name) == nil
         puts "svn uri must end with project name"
         return false
@@ -158,7 +112,7 @@ class Frame
     @project.unix_name = @project.name.downcase.gsub(/ \//, '_')        
     @version_control_dir = Dir.pwd + '/' + @project.unix_name
     @project_dir = @version_control_dir
-    if @project.use_svn
+    if @project.use_svn == :repository
       @project_dir += '/trunk'
     end  
   end
@@ -169,7 +123,7 @@ class Frame
   end
   
   def output_usage
-    RDoc::usage('usage')
+    RDoc::usage()
   end
   
   def output_version
@@ -189,7 +143,7 @@ class Frame
     
     FileUtils.mkdir_p @project_dir
     
-    if @project.use_svn
+    if @project.use_svn == :repository
       FileUtils.mkdir_p @version_control_dir + '/branches'
       FileUtils.mkdir_p @version_control_dir + '/tags'
     end
@@ -208,7 +162,7 @@ class Frame
     File.open(script, 'w') {|f| 
       f.puts("#!/usr/bin/env ruby")
       f.puts("$project_dir=File.dirname(File.dirname(File.expand_path(__FILE__)))")
-      f.puts("require '#{@generator_dir}/#{name}.rb'")
+      f.puts("require '#{@lib_dir}/#{name}.rb'")
       f.puts("app = #{name.capitalize}.new(ARGV)")
       f.puts("app.run")
       File.chmod(0700, script)}
@@ -252,14 +206,16 @@ class Frame
                     @project.remote_repository)
       Kernel.system('git', 'push', 'origin', 'master')
       file.cd('..')
-   end
-     if @project.use_svn
+     elsif @project.use_svn == :repository
        Kernel.system('svn', 'import', @version_control_dir, 
                      @project.remote_repository,
-                     "-m", "Checkin of generated directory structure.")
+                     "-m", "Checkin of generated project directory structure.")
        FileUtils.remove_entry_secure(@version_control_dir)
        Kernel.system('svn', 'checkout', "#{@project.remote_repository}/trunk",
                      @project.name)
+    elsif @project.use_svn == :directory
+      Kernel.system('svn', 'add', @version_control_dir,
+                     "-m", "Checkin of generated project directory structure.")
      end
   end
   

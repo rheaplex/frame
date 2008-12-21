@@ -72,6 +72,10 @@ class Work
   
   protected
   
+  def valid_status_dir filename
+    ["preparatory", "discard", "final"].include?(filename)
+  end
+
   def parsed_options?
     opts = OptionParser.new       
     opts.on('-v', '--version')        { output_version ; exit 0 }

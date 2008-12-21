@@ -16,6 +16,54 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#    Documentation here so RDoc can find it
+
+#    frame - create and manage digital art project directory structures
+#    Copyright (C) 2008 Rob Myers
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+# == Synopsis
+#    Creates a directory structure for an SVG-based art project
+#    and populates it with useful resources and scripts.
+#
+# == Examples
+#    Create a project called flowers:
+#    frame flowers
+#
+# == Usage
+#    frame [options] project_name
+#
+#    For help use: art_project -h
+#
+# == Options
+#   -h, --help          Displays help message
+#   -v, --version       Display version number
+#   -a, --artist        Your name
+#   -l, --license       Set the Creative Commons license URL for the project
+#   -g, --git URL       Use git for project vcs
+#   -r, --svn-rep URL   Use svn for project vcs, making a new repository
+#   -d, --svn-dir       Use svn for project vcs, in existing repository
+#   -d, --date          The year(s) for the copyright message
+#
+# == Author
+#    Rob Myers <rob@robmyers.org>
+#
+# == Copyright
+#    Copyright (C) 2008 Rob Myers. Licensed under the GNU GPL 3 or later.
+#    http://www.gnu.org/licenses/gpl-3.0.html
+
 bindir = File.dirname(__FILE__)
 rootdir = File.dirname(bindir) 
 
