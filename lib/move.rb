@@ -119,14 +119,14 @@ class Move
     if File.dirname(@arguments[0]) == "."
       # filename only
       @work = "#{@project_dir}/preparatory/#{@arguments[0]}"
-    elsif @arguments[0].index(@project_dir) != nil # Robustify me
-      # absolute path
+    elsif @arguments[0].index(@project_dir) != nil
+      # absolute or long paths
       @work = @arguments[0]
     else
       # status/filename
       @work = "#{@project_dir}/#{@arguments[0]}"
     end
-    @destination = file_of_status @work, @status
+     @destination = file_of_status @arguments[0], @status
   end
   
   def output_help
@@ -148,11 +148,11 @@ class Move
   end
    
   def using_git?
-    File.exists?("#{@project_path}/.git")
+    File.exists?("#{@project_dir}/.git")
   end
    
   def using_svn?
-      File.exists?("#{@project_path}/.svn")
+      File.exists?("#{@project_dir}/.svn")
   end
 
   def move_work_in_version_control
